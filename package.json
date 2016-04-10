@@ -1,0 +1,28 @@
+{
+  "name": "elm-bayesian-calculator",
+  "description": "Bayesian Calculator in Elm",
+  "version": "1.0.0",
+  "main": "calculator.js",
+  "dependencies": {
+    "bootstrap": "^3.3.6"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-elm": "^0.4.1",
+    "gulp-rename": "^1.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamzolotarev/elm-bayesian-calculator.git"
+  },
+  "author": "Adam Zolotarev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adamzolotarev/elm-bayesian-calculator/issues"
+  },
+  "homepage": "https://github.com/adamzolotarev/elm-bayesian-calculator#readme"
+}
