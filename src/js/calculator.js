@@ -11465,6 +11465,30 @@ Elm.Calculator.make = function (_elm) {
    $StartApp$Simple = Elm.StartApp.Simple.make(_elm),
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
+   var formGroupItem = function (body) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-group")]),
+      body);
+   };
+   var header = A2($Html.h1,
+   _U.list([]),
+   _U.list([$Html.text("Bayesian Calculator")]));
+   var explanations = _U.list(["5% of people have cancer - put .05 into \'Prior Probability\'"
+                              ,"Cancer test has 80% chance of producing a correct result  - put 0.8 into \'Hit Rate\'"
+                              ,"Cancer test has 20% chance of producing a false positive  - put 0.2 into \'False Alarm Rate\'"]);
+   var explanationsItems = A2($Html.ul,
+   _U.list([]),
+   A2($List.map,
+   function (l) {
+      return A2($Html.li,_U.list([]),_U.list([$Html.text(l)]));
+   },
+   explanations));
+   var explanation = A2($Html.div,
+   _U.list([]),
+   _U.list([A2($Html.h3,
+           _U.list([]),
+           _U.list([$Html.text("Explanation")]))
+           ,explanationsItems]));
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
@@ -11477,23 +11501,71 @@ Elm.Calculator.make = function (_elm) {
    var UpdateFalseAlarmRate = function (a) {
       return {ctor: "UpdateFalseAlarmRate",_0: a};
    };
+   var falseAlarmItem = F2(function (address,model) {
+      return _U.list([A2($Html.label,
+                     _U.list([$Html$Attributes.$for("falseAlarmRate")
+                             ,$Html$Attributes.$class("col-md-3 control-label")]),
+                     _U.list([$Html.text("False Alarm Rate")]))
+                     ,A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-9")]),
+                     _U.list([A2($Html.input,
+                     _U.list([$Html$Attributes.type$("text")
+                             ,$Html$Attributes.placeholder("0.00")
+                             ,$Html$Attributes.value(model.falseAlarmRate)
+                             ,$Html$Attributes.id("falseAlarmRate")
+                             ,$Html$Attributes.autofocus(true)
+                             ,A2($Utils.onInput,address,UpdateFalseAlarmRate)]),
+                     _U.list([]))]))]);
+   });
    var UpdateHitRate = function (a) {
       return {ctor: "UpdateHitRate",_0: a};
    };
+   var hitRateItem = F2(function (address,model) {
+      return _U.list([A2($Html.label,
+                     _U.list([$Html$Attributes.$for("hitRate")
+                             ,$Html$Attributes.$class("col-md-3 control-label")]),
+                     _U.list([$Html.text("Hit Rate")]))
+                     ,A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-9")]),
+                     _U.list([A2($Html.input,
+                     _U.list([$Html$Attributes.type$("text")
+                             ,$Html$Attributes.placeholder("0.00")
+                             ,$Html$Attributes.value(model.hitRate)
+                             ,$Html$Attributes.id("hitRate")
+                             ,$Html$Attributes.autofocus(true)
+                             ,A2($Utils.onInput,address,UpdateHitRate)]),
+                     _U.list([]))]))]);
+   });
    var UpdateInitialProbability = function (a) {
       return {ctor: "UpdateInitialProbability",_0: a};
    };
+   var priorProbabilityItem = F2(function (address,model) {
+      return _U.list([A2($Html.label,
+                     _U.list([$Html$Attributes.$for("priorProbability")
+                             ,$Html$Attributes.$class("col-md-3 control-label")]),
+                     _U.list([$Html.text("Prior Probability")]))
+                     ,A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-9")]),
+                     _U.list([A2($Html.input,
+                     _U.list([$Html$Attributes.type$("text")
+                             ,$Html$Attributes.placeholder("0.00")
+                             ,$Html$Attributes.value(model.priorProbability)
+                             ,$Html$Attributes.id("priorProbability")
+                             ,$Html$Attributes.autofocus(true)
+                             ,A2($Utils.onInput,address,UpdateInitialProbability)]),
+                     _U.list([]))]))]);
+   });
    var NoOp = {ctor: "NoOp"};
    var initialModel = {priorProbability: ""
                       ,hitRate: ""
                       ,falseAlarmRate: ""
                       ,newProbablity: ""};
+   var isGoodRate = function (rate) {
+      return !_U.eq(rate,".") && _U.cmp($Utils.parseFloat(rate),
+      0) > 0;
+   };
    var isValidModel = function (model) {
-      var falseAlarmRate = $Utils.parseFloat(model.falseAlarmRate);
-      var priorProbability = $Utils.parseFloat(model.priorProbability);
-      var hitRate = $Utils.parseFloat(model.hitRate);
-      return _U.cmp(hitRate,0) > 0 && (_U.cmp(priorProbability,
-      0) > 0 && _U.cmp(falseAlarmRate,0) > 0);
+      return isGoodRate(model.hitRate) && (isGoodRate(model.priorProbability) && isGoodRate(model.falseAlarmRate));
    };
    var bayesResult = function (model) {
       var falseAlarmRate = $Utils.parseFloat(model.falseAlarmRate);
@@ -11501,36 +11573,32 @@ Elm.Calculator.make = function (_elm) {
       var hitRate = $Utils.parseFloat(model.hitRate);
       return isValidModel(model) ? $Basics.toString(hitRate * priorProbability / (hitRate * priorProbability + falseAlarmRate * (1 - priorProbability))) : "";
    };
+   var resultItem = F2(function (address,model) {
+      return _U.list([A2($Html.label,
+                     _U.list([$Html$Attributes.$for("bayesResult")
+                             ,$Html$Attributes.$class("col-md-3 control-label")]),
+                     _U.list([$Html.text("New Probability")]))
+                     ,A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-9")]),
+                     _U.list([A2($Html.span,
+                     _U.list([]),
+                     _U.list([$Html.text(bayesResult(model))]))]))]);
+   });
    var entryForm = F2(function (address,model) {
       return A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.input,
-              _U.list([$Html$Attributes.type$("text")
-                      ,$Html$Attributes.placeholder("0.00")
-                      ,$Html$Attributes.value(model.priorProbability)
-                      ,$Html$Attributes.autofocus(true)
-                      ,A2($Utils.onInput,address,UpdateInitialProbability)]),
-              _U.list([]))
-              ,A2($Html.input,
-              _U.list([$Html$Attributes.type$("text")
-                      ,$Html$Attributes.placeholder("0.00")
-                      ,$Html$Attributes.value(model.hitRate)
-                      ,A2($Utils.onInput,address,UpdateHitRate)]),
-              _U.list([]))
-              ,A2($Html.input,
-              _U.list([$Html$Attributes.type$("text")
-                      ,$Html$Attributes.placeholder("0.00")
-                      ,$Html$Attributes.value(model.falseAlarmRate)
-                      ,A2($Utils.onInput,address,UpdateFalseAlarmRate)]),
-              _U.list([]))
-              ,A2($Html.h2,
-              _U.list([]),
-              _U.list([$Html.text(bayesResult(model))]))]));
+      _U.list([$Html$Attributes.$class("form-horizontal")]),
+      _U.list([formGroupItem(A2(priorProbabilityItem,address,model))
+              ,formGroupItem(A2(hitRateItem,address,model))
+              ,formGroupItem(A2(falseAlarmItem,address,model))
+              ,formGroupItem(A2(resultItem,address,model))]));
    });
    var view = F2(function (address,initialModel) {
       return A2($Html.div,
-      _U.list([$Html$Attributes.id("container")]),
-      _U.list([A2(entryForm,address,initialModel)]));
+      _U.list([$Html$Attributes.id("container")
+              ,$Html$Attributes.$class("col-md-4 col-md-offset-4")]),
+      _U.list([header
+              ,A2(entryForm,address,initialModel)
+              ,explanation]));
    });
    var main = $StartApp$Simple.start({model: initialModel
                                      ,view: view
@@ -11544,6 +11612,7 @@ Elm.Calculator.make = function (_elm) {
    return _elm.Calculator.values = {_op: _op
                                    ,Model: Model
                                    ,bayesResult: bayesResult
+                                   ,isGoodRate: isGoodRate
                                    ,isValidModel: isValidModel
                                    ,initialModel: initialModel
                                    ,NoOp: NoOp
@@ -11551,6 +11620,15 @@ Elm.Calculator.make = function (_elm) {
                                    ,UpdateHitRate: UpdateHitRate
                                    ,UpdateFalseAlarmRate: UpdateFalseAlarmRate
                                    ,update: update
+                                   ,explanations: explanations
+                                   ,explanation: explanation
+                                   ,explanationsItems: explanationsItems
+                                   ,priorProbabilityItem: priorProbabilityItem
+                                   ,hitRateItem: hitRateItem
+                                   ,falseAlarmItem: falseAlarmItem
+                                   ,header: header
+                                   ,formGroupItem: formGroupItem
+                                   ,resultItem: resultItem
                                    ,entryForm: entryForm
                                    ,view: view
                                    ,main: main};
