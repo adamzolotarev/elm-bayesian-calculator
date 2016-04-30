@@ -40,3 +40,5 @@ repl-temp-*
 
 #deployment files
 dest/*
+src/elm-bayesian-calculator.sublime-project
+src/elm-bayesian-calculator.sublime-workspace
