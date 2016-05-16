@@ -1,19 +1,13 @@
-module Calculator (..) where
+module Calculator exposing (main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-
-
---import Html.Events exposing (..)
---import String exposing (toUpper, repeat, trimRight)
-
-import StartApp.Simple as StartApp
-import Signal exposing (Address)
+import Html.App as Html
 import Utils
+import Html.Events as Events
 
 
 --MODEL
-
 
 type alias Model =
   { priorProbability : String
@@ -69,16 +63,19 @@ initialModel =
 -- Update
 
 
-type Action
+type Msg
   = NoOp
   | UpdateInitialProbability String
   | UpdateHitRate String
   | UpdateFalseAlarmRate String
 
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  ( updateModel msg model, Cmd.none )
 
-update : Action -> Model -> Model
-update action model =
-  case action of
+updateModel : Msg -> Model -> Model
+updateModel msg model =
+  case msg of
     NoOp ->
       model
 
@@ -104,7 +101,7 @@ explanations =
   ]
 
 
-explanation : Html
+explanation : Html a
 explanation =
   div
     []
@@ -113,15 +110,15 @@ explanation =
     ]
 
 
-explanationsItems : Html
+explanationsItems : Html a
 explanationsItems =
   ul
     []
     (List.map (\l -> li [] [ text l ]) explanations)
 
 
-priorProbabilityItem : Address Action -> Model -> List Html
-priorProbabilityItem address model =
+priorProbabilityItem : { a | priorProbability : String } -> List (Html Msg)
+priorProbabilityItem model =
   [ label
       [ for "priorProbability", class "col-md-3 control-label" ]
       [ text "Prior Probability" ]
@@ -133,15 +130,15 @@ priorProbabilityItem address model =
           , value model.priorProbability
           , id "priorProbability"
           , autofocus True
-          , Utils.onInput address UpdateInitialProbability
+          , Events.onInput UpdateInitialProbability          
           ]
           []
       ]
   ]
 
 
-hitRateItem : Address Action -> Model -> List Html
-hitRateItem address model =
+hitRateItem: { a | hitRate : String } -> List (Html Msg)
+hitRateItem model =
   [ label
       [ for "hitRate", class "col-md-3 control-label" ]
       [ text "Hit Rate" ]
@@ -153,15 +150,15 @@ hitRateItem address model =
           , value model.hitRate
           , id "hitRate"
           , autofocus True
-          , Utils.onInput address UpdateHitRate
+          , Events.onInput UpdateHitRate          
           ]
           []
       ]
   ]
 
 
-falseAlarmItem : Address Action -> Model -> List Html
-falseAlarmItem address model =
+falseAlarmItem : { a | falseAlarmRate : String } -> List (Html Msg)
+falseAlarmItem model =
   [ label
       [ for "falseAlarmRate", class "col-md-3 control-label" ]
       [ text "False Alarm Rate" ]
@@ -173,27 +170,27 @@ falseAlarmItem address model =
           , value model.falseAlarmRate
           , id "falseAlarmRate"
           , autofocus True
-          , Utils.onInput address UpdateFalseAlarmRate
+          , Events.onInput UpdateFalseAlarmRate          
           ]
           []
       ]
   ]
 
 
-header : Html
+header : Html a
 header =
   h1 [] [ text "Bayesian Calculator" ]
 
 
-formGroupItem : List Html -> Html
+formGroupItem : List (Html a) -> Html a
 formGroupItem body =
   div
     [ class "form-group" ]
     body
 
 
-resultItem : Address Action -> Model -> List Html
-resultItem address model =
+resultItem: Model -> List (Html a)
+resultItem model =
   [ label
       [ for "bayesResult", class "col-md-3 control-label" ]
       [ text "New Probability" ]
@@ -204,23 +201,25 @@ resultItem address model =
   ]
 
 
-entryForm : Address Action -> Model -> Html
-entryForm address model =
+entryForm : Model -> Html Msg
+entryForm model =
   div
     [ class "form-horizontal" ]
-    [ formGroupItem (priorProbabilityItem address model)
-    , formGroupItem (hitRateItem address model)
-    , formGroupItem (falseAlarmItem address model)
-    , formGroupItem (resultItem address model)
+    [ formGroupItem (priorProbabilityItem model)
+    , formGroupItem (hitRateItem model)
+    , formGroupItem (falseAlarmItem model)
+    , formGroupItem (resultItem model)
     ]
 
+init : (Model, Cmd Msg)  
+init = (initialModel, Cmd.none) 
 
-view : Address Action -> Model -> Html
-view address initialModel =
+view : Model -> Html Msg
+view initialModel =
   div
     [ id "container", class "col-md-4 col-md-offset-4" ]
     [ header
-    , entryForm address initialModel
+    , entryForm initialModel
     , explanation
     ]
 
@@ -229,13 +228,11 @@ view address initialModel =
 --Wire it all together
 
 
-main : Signal Html
-main =
-  --initialModel
-  --  |> update Sort
-  --  |> view
-  StartApp.start
-    { model = initialModel
-    , view = view
+main : Program Never
+main =  
+  Html.program
+    { init = init
     , update = update
+    , view = view
+    , subscriptions = \_ -> Sub.none
     }

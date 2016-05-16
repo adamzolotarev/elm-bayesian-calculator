@@ -10,7 +10,8 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-elm": "^0.4.1",
-    "gulp-rename": "^1.2.2"
+    "gulp-rename": "^1.2.2",
+    "jquery": "^2.2.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
